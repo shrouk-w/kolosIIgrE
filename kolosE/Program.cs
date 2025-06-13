@@ -1,5 +1,6 @@
 using kolokwiumA.Middlewares;
 using kolosE.DAL;
+using kolosE.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -24,7 +25,7 @@ public class Program
                 .LogTo(Console.WriteLine, LogLevel.Information);
         });
 
-        //builder.Services.AddScoped<ICustomerService, CustomerService>();
+        builder.Services.AddScoped<INurseriesService, NurseriesService>();
         
         
         builder.Services.AddSwaggerGen(c =>
