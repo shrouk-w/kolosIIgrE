@@ -1,4 +1,4 @@
-﻿using kolokwiumA.Exceptions;
+﻿using kolosE.Exceptions;
 using kolosE.DAL;
 using kolosE.Models;
 using kolosE.Models.DTOs;

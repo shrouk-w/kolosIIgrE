@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using kolokwiumA.Exceptions;
+using kolosE.Exceptions;
 
-namespace kolokwiumA.Middlewares;
+namespace kolosE.Middlewares;
 
 public class GlobalExceptionHandlingMiddleware
 {

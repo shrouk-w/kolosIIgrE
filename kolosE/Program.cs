@@ -1,4 +1,4 @@
-using kolokwiumA.Middlewares;
+using kolosE.Middlewares;
 using kolosE.DAL;
 using kolosE.Services;
 using Microsoft.EntityFrameworkCore;
