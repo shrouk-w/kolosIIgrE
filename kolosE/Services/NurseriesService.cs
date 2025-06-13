@@ -1,5 +1,6 @@
 ﻿using kolokwiumA.Exceptions;
 using kolosE.DAL;
+using kolosE.Models;
 using kolosE.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 
@@ -76,4 +77,62 @@ public class NurseriesService : INurseriesService
         return response;
 
     }
+
+    public async Task InsertNewBatchAsync(BatchRequestDTO request, CancellationToken token)
+    {
+        var species = await _DbContext.TreeSpecies.Where(p => p.LatinName == request.Species)
+            .FirstOrDefaultAsync(token);
+        
+        if(species == null)
+            throw new NotFoundException("Species not found");
+        
+        var nursery = await _DbContext.Nurseries.Where(p=>p.Name == request.Nursery).FirstOrDefaultAsync(token);
+        
+        if (nursery == null)
+            throw new NotFoundException("Nursery not found");
+        
+        using (var transaction = await _DbContext.Database.BeginTransactionAsync())
+        {
+            try
+            {
+                var batch = new Seedling_Batch()
+                {
+                    NurseryId = nursery.NurseryId,
+                    SpeciesId = species.SpeciesId,
+                    Quantity = request.quantity,
+                    SownDate = DateTime.Now
+                };
+                
+                await _DbContext.SeedlingBatches.AddAsync(batch, token);
+                await _DbContext.SaveChangesAsync(token);
+
+                foreach (var r in request.Responsible)
+                {
+                    var employee = await _DbContext.Employees.Where(e => e.EmployeeId == r.EmployeeId).FirstOrDefaultAsync(token);
+                    if (employee == null)
+                        throw new NotFoundException("Employee not found");
+
+                    var responsible = new Responsible()
+                    {
+                        EmployeeId = r.EmployeeId,
+                        BatchId = batch.BatchId,
+                        Role = r.Role,
+                    };
+                    
+                    await _DbContext.Responsibles.AddAsync(responsible);
+                    await _DbContext.SaveChangesAsync(token);
+
+                }
+                
+                await transaction.CommitAsync(token);
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw ;
+            }
+        }
+    }
+    
+    
 }
